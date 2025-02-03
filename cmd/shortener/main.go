@@ -33,7 +33,7 @@ func ShortenURLHandler(c *gin.Context) {
 	urlStore[shortURL] = string(longURL)
 	mutex.Unlock()
 	//c.Writer(http.StatusOK, shortURL)
-	c.String(http.StatusCreated, baseURL+shortURL)
+	c.String(http.StatusCreated, baseURL+"/"+shortURL)
 }
 
 // RedirectHandler redirects short URL to the original long URL
@@ -66,7 +66,7 @@ func generateShortURL() string {
 
 func main() {
 	flag.StringVar(&serverName, "a", "localhost:8080", "Server name with port")
-	flag.StringVar(&baseURL, "b", "http://localhost:8080/", "Base URL for shortened links")
+	flag.StringVar(&baseURL, "b", "http://localhost:8080", "Base URL for shortened links")
 
 	// Parse the command line flags
 	flag.Parse()
