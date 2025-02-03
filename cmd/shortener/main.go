@@ -98,7 +98,7 @@ func main() {
 	//router.Use(gin.Recovery())
 
 	router.POST("/", ShortenURLHandler)
-	router.GET("/:short_url/", RedirectHandler)
+	router.GET("/:short_url", RedirectHandler)
 
 	router.Run(serverName)
 }
