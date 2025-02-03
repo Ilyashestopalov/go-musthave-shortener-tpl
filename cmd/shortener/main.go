@@ -33,7 +33,7 @@ func ShortenURLHandler(c *gin.Context) {
 	urlStore[shortURL] = string(longURL)
 	mutex.Unlock()
 	//c.Writer(http.StatusOK, shortURL)
-	c.String(http.StatusCreated, baseURL+"/"+shortURL)
+	c.String(http.StatusCreated, baseURL+shortURL)
 }
 
 // RedirectHandler redirects short URL to the original long URL
