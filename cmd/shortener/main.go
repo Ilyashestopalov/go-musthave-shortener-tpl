@@ -49,7 +49,7 @@ func RedirectHandler(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusMovedPermanently, longURL)
+	c.Redirect(http.StatusTemporaryRedirect, longURL)
 }
 
 func generateShortURL() string {
