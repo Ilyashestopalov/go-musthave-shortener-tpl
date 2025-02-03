@@ -1,6 +1,6 @@
 module github.com/Ilyashestopalov/go-musthave-shortener-tpl
 
-go 1.23.2
+go 1.22.11
 
 require (
 	github.com/bytedance/sonic v1.12.8 // indirect
