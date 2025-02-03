@@ -23,7 +23,7 @@ func TestShortenURLHandler(t *testing.T) {
 
 	// Test valid request
 	longURL := "https://www.example.com"
-	req, _ := http.NewRequest(http.MethodPost, "/shorten", bytes.NewBuffer([]byte(longURL)))
+	req, _ := http.NewRequest(http.MethodPost, "/", bytes.NewBuffer([]byte(longURL)))
 	req.Header.Set("Content-Type", "text/plain")
 
 	w := httptest.NewRecorder()
@@ -34,7 +34,7 @@ func TestShortenURLHandler(t *testing.T) {
 
 	// Test invalid request
 	invalidLongURL := ""
-	req, _ = http.NewRequest(http.MethodPost, "/shorten", bytes.NewBuffer([]byte(invalidLongURL)))
+	req, _ = http.NewRequest(http.MethodPost, "/", bytes.NewBuffer([]byte(invalidLongURL)))
 	req.Header.Set("Content-Type", "text/plain")
 
 	w = httptest.NewRecorder()
