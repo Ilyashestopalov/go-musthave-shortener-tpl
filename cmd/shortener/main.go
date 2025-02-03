@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -14,10 +13,10 @@ import (
 )
 
 var (
-	urlStore   = make(map[string]string) // Store for mapping short URLs to long URLs
-	mutex      = &sync.Mutex{}           // Mutex for thread-safe operations
-	serverName string                    // Server name for listen socket
-	baseURL    string                    // Server name for response
+	urlStore = make(map[string]string) // Store for mapping short URLs to long URLs
+	//mutex      = &sync.Mutex{}           // Mutex for thread-safe operations
+	serverName string // Server name for listen socket
+	baseURL    string // Server name for response
 )
 
 // ShortenURLHandler handles the URL shortening requests
@@ -28,10 +27,10 @@ func ShortenURLHandler(c *gin.Context) {
 		return
 	}
 
-	mutex.Lock()
+	//mutex.Lock()
 	shortURL := generateShortURL()
 	urlStore[shortURL] = string(longURL)
-	mutex.Unlock()
+	//mutex.Unlock()
 	//c.Writer(http.StatusOK, shortURL)
 	c.String(http.StatusCreated, baseURL+"/"+shortURL)
 }
@@ -40,9 +39,9 @@ func ShortenURLHandler(c *gin.Context) {
 func RedirectHandler(c *gin.Context) {
 	shortURL := c.Param("short_url")
 
-	mutex.Lock()
+	//mutex.Lock()
 	longURL, exists := urlStore[shortURL]
-	mutex.Unlock()
+	//mutex.Unlock()
 
 	if !exists {
 		c.String(http.StatusNotFound, "URL not found")
