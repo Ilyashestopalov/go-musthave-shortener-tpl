@@ -24,7 +24,7 @@ var (
 func ShortenURLHandler(c *gin.Context) {
 	longURL, err := c.GetRawData()
 	if err != nil || len(longURL) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid URL"})
+		c.String(http.StatusBadRequest, "Invalid URL")
 		return
 	}
 
@@ -33,7 +33,7 @@ func ShortenURLHandler(c *gin.Context) {
 	urlStore[shortURL] = string(longURL)
 	mutex.Unlock()
 	//c.Writer(http.StatusOK, shortURL)
-	c.String(http.StatusOK, baseURL+shortURL)
+	c.String(http.StatusCreated, baseURL+shortURL)
 }
 
 // RedirectHandler redirects short URL to the original long URL
