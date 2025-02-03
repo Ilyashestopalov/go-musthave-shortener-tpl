@@ -44,7 +44,7 @@ func TestShortenURLHandler(t *testing.T) {
 	assert.Contains(t, w.Body.String(), "error")
 }
 
-func TestIteration2(t *testing.T) {
+func TestRedirectHandler(t *testing.T) {
 	router := setupRouter()
 
 	// First create a short URL
