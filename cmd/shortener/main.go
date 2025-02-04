@@ -3,22 +3,20 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net/http"
 	"os"
-	"strings"
 	"time"
 
+	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/links"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/exp/rand"
 )
 
 var (
-	urlStore = make(map[string]string) // Store for mapping short URLs to long URLs
-	//mutex      = &sync.Mutex{}           // Mutex for thread-safe operations
-	serverName string // Server name for listen socket
-	baseURL    string // Server name for response
+	urlStore   = make(map[string]string) // Store for mapping short URLs to long URLs
+	serverName string                    // Server name for listen socket
+	baseURL    string                    // Server name for response
 )
 
+/*
 // ShortenURLHandler handles the URL shortening requests
 func ShortenURLHandler(c *gin.Context) {
 	longURL, err := c.GetRawData()
@@ -27,11 +25,8 @@ func ShortenURLHandler(c *gin.Context) {
 		return
 	}
 
-	//mutex.Lock()
 	shortURL := generateShortURL()
 	urlStore[shortURL] = string(longURL)
-	//mutex.Unlock()
-	//c.Writer(http.StatusOK, shortURL)
 	c.String(http.StatusCreated, baseURL+"/"+shortURL)
 }
 
@@ -39,9 +34,7 @@ func ShortenURLHandler(c *gin.Context) {
 func RedirectHandler(c *gin.Context) {
 	shortURL := c.Param("short_url")
 
-	//mutex.Lock()
 	longURL, exists := urlStore[shortURL]
-	//mutex.Unlock()
 
 	if !exists {
 		c.String(http.StatusNotFound, "URL not found")
@@ -62,6 +55,7 @@ func generateShortURL() string {
 	}
 	return output.String()
 }
+*/
 
 func main() {
 	flag.StringVar(&serverName, "a", "localhost:8080", "Server name with port")
@@ -96,8 +90,8 @@ func main() {
 	}))
 	//router.Use(gin.Recovery())
 
-	router.POST("/", ShortenURLHandler)
-	router.GET("/:short_url", RedirectHandler)
+	router.POST("/", links.ShortenURLHandler(baseURL, urlStore))
+	router.GET("/:short_url", links.RedirectHandler(urlStore))
 
 	router.Run(serverName)
 }
