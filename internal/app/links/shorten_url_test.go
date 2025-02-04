@@ -8,7 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aseptimu/url-shortener/internal/app/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
