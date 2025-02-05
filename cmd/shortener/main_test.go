@@ -22,7 +22,7 @@ func TestShortenURLHandler(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
-	if w.Code != http.StatusOK {
+	if w.Code != http.StatusCreated {
 		t.Errorf("Expected status code 200, got %d", w.Code)
 	}
 
