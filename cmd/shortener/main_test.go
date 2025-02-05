@@ -12,7 +12,7 @@ import (
 
 func TestShortenURLHandler(t *testing.T) {
 	router := gin.Default()
-	router.POST("/shorten", ShortenURLHandler)
+	router.POST("/", ShortenURLHandler)
 
 	// Test valid request
 	longURL := "https://www.example.com"
