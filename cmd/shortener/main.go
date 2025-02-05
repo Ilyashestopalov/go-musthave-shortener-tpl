@@ -3,11 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
-	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/links"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/exp/rand"
 )
 
 var (
@@ -16,7 +18,6 @@ var (
 	baseURL    string                    // Server name for response
 )
 
-/*
 // ShortenURLHandler handles the URL shortening requests
 func ShortenURLHandler(c *gin.Context) {
 	longURL, err := c.GetRawData()
@@ -44,6 +45,7 @@ func RedirectHandler(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, longURL)
 }
 
+// TODO: move it internal/app/helpers/generators.go
 func generateShortURL() string {
 	var charSet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	var output strings.Builder
@@ -55,7 +57,6 @@ func generateShortURL() string {
 	}
 	return output.String()
 }
-*/
 
 func main() {
 	flag.StringVar(&serverName, "a", "localhost:8080", "Server name with port")
@@ -90,8 +91,8 @@ func main() {
 	}))
 	//router.Use(gin.Recovery())
 
-	router.POST("/", links.ShortenURLHandler(baseURL, urlStore))
-	router.GET("/:short_url", links.RedirectHandler(urlStore))
+	router.POST("/", ShortenURLHandler)
+	router.GET("/:short_url", RedirectHandler)
 
 	router.Run(serverName)
 }
