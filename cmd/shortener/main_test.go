@@ -64,7 +64,7 @@ func TestRedirectHandler(t *testing.T) {
 
 	// First create a short URL
 	longURL := "https://www.example.com"
-	req, _ := http.NewRequest(http.MethodPost, "/shorten", bytes.NewBuffer([]byte(longURL)))
+	req, _ := http.NewRequest(http.MethodPost, "/", bytes.NewBuffer([]byte(longURL)))
 	req.Header.Set("Content-Type", "text/plain")
 
 	w := httptest.NewRecorder()
