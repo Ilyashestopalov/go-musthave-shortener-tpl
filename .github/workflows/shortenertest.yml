@@ -69,7 +69,6 @@ jobs:
           github.head_ref == 'iter3' ||
           github.head_ref == 'iter4' ||
           github.head_ref == 'iter5' ||
-          github.head_ref == 'iter5-release' ||
           github.head_ref == 'iter6' ||
           github.head_ref == 'iter7' ||
           github.head_ref == 'iter8' ||
