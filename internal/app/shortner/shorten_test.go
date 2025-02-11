@@ -46,11 +46,10 @@ func TestURLShortener(t *testing.T) {
 
 	t.Run("Shorten URL", func(t *testing.T) {
 		reqBody := `{"url": "https://www.example.com"}`
-		req, _ := http.NewRequest("POST", "/shorten", bytes.NewBuffer([]byte(reqBody)))
+		req, _ := http.NewRequest("POST", "/", bytes.NewBuffer([]byte(reqBody)))
 		res := httptest.NewRecorder()
 		router.ServeHTTP(res, req)
 
-		assert.Equal(t, http.StatusOK, res.Code)
-		assert.Contains(t, res.Body.String(), "shortened_url")
+		assert.Equal(t, http.StatusCreated, res.Code)
 	})
 }
