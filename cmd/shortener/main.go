@@ -1,38 +1,24 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"os"
+	"log"
 	"time"
 
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/interfaces"
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/shortner"
+	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/config"
 	"github.com/gin-gonic/gin"
-)
-
-var (
-	serverName string // Server name for listen socket
-	baseURL    string // Server name for response
 )
 
 // Main function to set up the Gin server
 func main() {
-
 	shortener := interfaces.NewMapURLShortener()
 
-	flag.StringVar(&serverName, "a", "localhost:8080", "Server name with port")
-	flag.StringVar(&baseURL, "b", "http://localhost:8080", "Base URL for shortened links")
-
-	// Parse the command line flags
-	flag.Parse()
-
-	// Overwrite with environment variables if set
-	if envBaseURL := os.Getenv("BASE_URL"); envBaseURL != "" {
-		baseURL = envBaseURL
-	}
-	if envServerName := os.Getenv("SERVER_NAME"); envServerName != "" {
-		serverName = envServerName
+	// Load configuration
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatal("Error loading configuration:", err)
 	}
 
 	gin.SetMode(gin.ReleaseMode)
@@ -53,8 +39,8 @@ func main() {
 		)
 	}))
 
-	router.POST("/", shortner.ShortenURLHandler(shortener, baseURL))
+	router.POST("/", shortner.ShortenURLHandler(shortener, cfg.BaseURL))
 	router.GET("/:shortened", shortner.RedirectURLHandler(shortener))
 
-	router.Run(serverName)
+	router.Run(cfg.ServerName)
 }
