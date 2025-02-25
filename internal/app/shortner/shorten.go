@@ -39,6 +39,6 @@ func APIShortenURLHandler(shortener interfaces.URLShortener, baseURL string) gin
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"result": baseURL + "/" + shortened})
+		c.JSON(http.StatusCreated, gin.H{"result": baseURL + "/" + shortened})
 	}
 }
