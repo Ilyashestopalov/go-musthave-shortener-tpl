@@ -27,7 +27,7 @@ func ShortenURLHandler(shortener interfaces.URLShortener, baseURL string) gin.Ha
 }
 
 // Handler for shortening a URL via API
-func ApiShortenURLHandler(shortener interfaces.URLShortener, baseURL string) gin.HandlerFunc {
+func APIShortenURLHandler(shortener interfaces.URLShortener, baseURL string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var json models.APIShortenURL
 		if err := c.ShouldBindJSON(&json); err != nil {
