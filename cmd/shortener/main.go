@@ -5,7 +5,7 @@ import (
 
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/interfaces"
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/middlewares"
-	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/shortner"
+	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/routes"
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/config"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -34,8 +34,9 @@ func main() {
 
 	router.Use(middlewares.Logger(logger))
 
-	router.POST("/", shortner.ShortenURLHandler(shortener, cfg.BaseURL))
-	router.GET("/:shortened", shortner.RedirectURLHandler(shortener))
+	// Register routes
+	routes.RegisterRoutes(router, shortener, cfg.BaseURL)
 
+	// Run server
 	router.Run(cfg.ServerName)
 }
