@@ -32,7 +32,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 
-	router.Use(middlewares.Logger(logger))
+	router.Use(middlewares.LoggerMiddleware(logger), middlewares.GzipMiddleware())
 
 	// Register routes
 	routes.RegisterRoutes(router, shortener, cfg.BaseURL)
