@@ -17,7 +17,8 @@ type gzipResponseWriter struct {
 // GzipMiddleware compresses the response using gzip
 func GzipMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.Header.Get("Accept-Encoding") == "" {
+		if c.Request.Header.Get("Accept-Encoding") == "" &&
+			(c.Request.Header.Get("Content-Type") != "application/json" || c.Request.Header.Get("Content-Type") != "text/html") {
 			c.Next()
 			return
 		}
