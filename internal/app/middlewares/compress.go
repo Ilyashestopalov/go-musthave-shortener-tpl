@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"bytes"
 	"compress/gzip"
 	"io"
 	"net/http"
@@ -10,13 +9,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// gzipResponseWriter is a wrapper for gin's ResponseWriter to write compressed data
-type gzipResponseWriter struct {
+type gzipWriter struct {
 	gin.ResponseWriter
-	Writer io.Writer
+	writer *gzip.Writer
 }
 
-// GzipMiddleware compresses the response using gzip
+func (g *gzipWriter) Write(data []byte) (int, error) {
+	return g.writer.Write(data)
+}
+
 func GzipMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.GetHeader("Content-Encoding") == "gzip" {
@@ -34,26 +35,12 @@ func GzipMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		var buf bytes.Buffer
-		gz := gzip.NewWriter(&buf)
+		gzWriter := gzip.NewWriter(c.Writer)
+		defer gzWriter.Close()
 
-		// Wrap the ResponseWriter
-		w := &gzipResponseWriter{ResponseWriter: c.Writer, Writer: gz}
-		c.Writer = w
+		c.Writer = &gzipWriter{ResponseWriter: c.Writer, writer: gzWriter}
+		c.Header("Content-Encoding", "gzip")
 
-		// Process request
 		c.Next()
-
-		// Close the gzip writer to flush the data
-		if err := gz.Close(); err != nil {
-			c.Error(err)
-			return
-		}
-
-		// Set the Content-Encoding header
-		c.Writer.Header().Set("Content-Encoding", "gzip")
-		c.Writer.Header().Set("Content-Type", "application/json")
-		c.Writer.WriteHeader(c.Writer.Status())
-		io.Copy(c.Writer, &buf)
 	}
 }
