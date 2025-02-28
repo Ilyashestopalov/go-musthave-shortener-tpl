@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"compress/gzip"
 	"io"
+	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,11 +19,21 @@ type gzipResponseWriter struct {
 // GzipMiddleware compresses the response using gzip
 func GzipMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.Header.Get("Accept-Encoding") == "" &&
-			(c.Request.Header.Get("Content-Type") != "application/json" || c.Request.Header.Get("Content-Type") != "text/html") {
+		if c.GetHeader("Content-Encoding") == "gzip" {
+			reader, err := gzip.NewReader(c.Request.Body)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid Gzip content"})
+				return
+			}
+			defer reader.Close()
+			c.Request.Body = io.NopCloser(reader)
+		}
+
+		if !strings.Contains(c.GetHeader("Accept-Encoding"), "gzip") {
 			c.Next()
 			return
 		}
+
 		var buf bytes.Buffer
 		gz := gzip.NewWriter(&buf)
 
