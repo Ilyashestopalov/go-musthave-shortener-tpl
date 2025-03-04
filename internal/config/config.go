@@ -6,19 +6,22 @@ import (
 )
 
 var (
-	serverName string
-	baseURL    string
+	serverName      string
+	baseURL         string
+	fileStoragePath string
 )
 
 // Config holds the configuration for the server
 type Config struct {
-	BaseURL    string
-	ServerName string
+	BaseURL         string
+	ServerName      string
+	FileStoragePath string
 }
 
 func LoadConfig() (*Config, error) {
 	flag.StringVar(&serverName, "a", "localhost:8080", "Server name with port")
 	flag.StringVar(&baseURL, "b", "http://localhost:8080", "Base URL for shortened links")
+	flag.StringVar(&fileStoragePath, "f", "/tmp/data.json", "Path for storage file")
 
 	// Parse the command line flags
 	flag.Parse()
@@ -30,9 +33,13 @@ func LoadConfig() (*Config, error) {
 	if serverName == "" {
 		serverName = os.Getenv("SERVER_NAME")
 	}
+	if fileStoragePath == "" {
+		fileStoragePath = os.Getenv("FILE_STORAGE_PATH")
+	}
 
 	return &Config{
-		BaseURL:    baseURL,
-		ServerName: serverName,
+		BaseURL:         baseURL,
+		ServerName:      serverName,
+		FileStoragePath: fileStoragePath,
 	}, nil
 }

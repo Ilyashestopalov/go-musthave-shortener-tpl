@@ -3,11 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/interfaces"
-	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/middlewares"
-	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/routes"
+	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/server"
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/config"
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
@@ -21,22 +18,15 @@ func main() {
 	}
 	defer logger.Sync() // Flush any buffered log entries
 
-	shortener := interfaces.NewMapURLShortener()
-
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatal("Error loading configuration:", err)
 	}
 
-	gin.SetMode(gin.ReleaseMode)
-	router := gin.New()
+	err = server.Run(logger, cfg)
+	if err != nil {
+		log.Fatal("Server failed to start on %s: %v", cfg.ServerName, err)
+	}
 
-	router.Use(middlewares.LoggerMiddleware(logger), middlewares.GzipMiddleware())
-
-	// Register routes
-	routes.RegisterRoutes(router, shortener, cfg.BaseURL)
-
-	// Run server
-	router.Run(cfg.ServerName)
 }
