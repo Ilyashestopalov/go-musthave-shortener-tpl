@@ -18,7 +18,7 @@ type mockService struct{}
 
 func (m *mockService) ShortenURL(url string) (string, error) {
 	if url == "http://example.com" {
-		return "abcdef", nil
+		return "xxxxxx", nil
 	}
 	return "", errors.New("invalid URL format")
 }
