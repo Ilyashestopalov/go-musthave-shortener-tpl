@@ -26,7 +26,7 @@ func main() {
 
 	err = server.Run(logger, cfg)
 	if err != nil {
-		log.Fatal("Server failed to start on %s: %v", cfg.ServerName, err)
+		log.Fatal("Server failed to start", err)
 	}
 
 }
