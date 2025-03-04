@@ -30,9 +30,11 @@ func LoadConfig() (*Config, error) {
 	if v := os.Getenv("BASE_URL"); v != "" {
 		baseURL = v
 	}
+
 	if v := os.Getenv("SERVER_NAME"); v != "" {
 		serverName = v
 	}
+
 	if v := os.Getenv("FILE_STORAGE_PATH"); v != "" {
 		fileStoragePath = v
 	}
