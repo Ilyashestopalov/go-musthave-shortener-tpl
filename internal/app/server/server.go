@@ -28,6 +28,6 @@ func Run(logger *zap.Logger, cfg *config.Config) error {
 	router.GET("/:url", handler.RedirectURL)
 	router.POST("/", handler.URLCreator)
 	router.POST("/api/shorten", handler.URLCreatorJSON)
-
+	// fmt.Printf("%+v\n", cfg)
 	return router.Run(cfg.ServerName)
 }

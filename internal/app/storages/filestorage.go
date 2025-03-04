@@ -14,14 +14,14 @@ type URLRecord struct {
 	OriginalURL string `json:"original_url"`
 }
 
-type FileStore struct {
+type FileStorage struct {
 	mu       sync.RWMutex
 	filePath string
 	data     map[string]string
 }
 
-func NewFileStore(filePath string) *FileStore {
-	store := &FileStore{
+func NewFileStore(filePath string) *FileStorage {
+	store := &FileStorage{
 		filePath: filePath,
 		data:     make(map[string]string),
 	}
@@ -29,7 +29,8 @@ func NewFileStore(filePath string) *FileStore {
 	return store
 }
 
-func (fs *FileStore) loadFromFile() {
+func (fs *FileStorage) loadFromFile() {
+	//fmt.Printf(fs.filePath)
 	file, err := os.Open(fs.filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -48,7 +49,8 @@ func (fs *FileStore) loadFromFile() {
 	}
 }
 
-func (fs *FileStore) saveToFile(shortURL, originalURL string) {
+func (fs *FileStorage) saveToFile(shortURL, originalURL string) {
+	//fmt.Printf(fs.filePath)
 	file, err := os.OpenFile(fs.filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Panic(err)
@@ -66,14 +68,14 @@ func (fs *FileStore) saveToFile(shortURL, originalURL string) {
 	file.Write([]byte("\n"))
 }
 
-func (fs *FileStore) Get(shortURL string) (string, bool) {
+func (fs *FileStorage) Get(shortURL string) (string, bool) {
 	fs.mu.RLock()
 	defer fs.mu.RUnlock()
 	value, exists := fs.data[shortURL]
 	return value, exists
 }
 
-func (fs *FileStore) Set(shortURL, originalURL string) {
+func (fs *FileStorage) Set(shortURL, originalURL string) {
 	fs.mu.Lock()
 	defer fs.mu.Unlock()
 	fs.data[shortURL] = originalURL
