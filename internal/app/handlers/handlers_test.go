@@ -24,7 +24,7 @@ func (m *mockService) ShortenURL(url string) (string, error) {
 }
 
 func (m *mockService) GetOriginalURL(input string) (string, bool) {
-	if input == "abcdef" {
+	if input == "xxxxxx" {
 		return "http://example.com", true
 	}
 	return "", false
@@ -50,6 +50,26 @@ func TestURLCreator(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, res.StatusCode)
 }
 
+func TestRedirectURL(t *testing.T) {
+	cfg := &config.Config{BaseURL: "http://localhost:8080"}
+	handler := NewHandler(cfg, &mockService{})
+
+	router := gin.New()
+	router.GET("/:url", handler.RedirectURL)
+
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest(http.MethodGet, "/xxxxxx", nil)
+
+	router.ServeHTTP(w, r)
+
+	res := w.Result()
+	defer res.Body.Close()
+
+	require.NotNil(t, res)
+	assert.Equal(t, http.StatusTemporaryRedirect, res.StatusCode)
+	assert.Equal(t, "http://example.com", res.Header.Get("Location"))
+}
+
 func TestURLCreatorJSON(t *testing.T) {
 	cfg := &config.Config{BaseURL: "http://localhost:8080"}
 	handler := NewHandler(cfg, &mockService{})
@@ -70,7 +90,7 @@ func TestURLCreatorJSON(t *testing.T) {
 	require.NotNil(t, res)
 	assert.Equal(t, http.StatusCreated, res.StatusCode)
 
-	expectedResponse := `{"result":"http://localhost:8080/azazaz"}`
+	expectedResponse := `{"result":"http://localhost:8080/xxxxxx"}`
 	bodyBytes, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	assert.JSONEq(t, expectedResponse, string(bodyBytes))
