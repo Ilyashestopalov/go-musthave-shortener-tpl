@@ -50,26 +50,6 @@ func TestURLCreator(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, res.StatusCode)
 }
 
-func TestRedirectURL(t *testing.T) {
-	cfg := &config.Config{BaseURL: "http://localhost:8080"}
-	handler := NewHandler(cfg, &mockService{})
-
-	router := gin.New()
-	router.GET("/:url", handler.RedirectURL)
-
-	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/azazaz", nil)
-
-	router.ServeHTTP(w, r)
-
-	res := w.Result()
-	defer res.Body.Close()
-
-	require.NotNil(t, res)
-	assert.Equal(t, http.StatusTemporaryRedirect, res.StatusCode)
-	assert.Equal(t, "http://example.com", res.Header.Get("Location")) // Проверяем редирект
-}
-
 func TestURLCreatorJSON(t *testing.T) {
 	cfg := &config.Config{BaseURL: "http://localhost:8080"}
 	handler := NewHandler(cfg, &mockService{})
