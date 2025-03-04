@@ -35,7 +35,7 @@ func TestPostURL(t *testing.T) {
 	handler := NewHandler(cfg, &mockService{})
 
 	router := gin.New()
-	router.POST("/", handler.PostURL)
+	router.POST("/", handler.URLCreator)
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader("http://example.com"))
@@ -75,7 +75,7 @@ func TestPostURLJSON(t *testing.T) {
 	handler := NewHandler(cfg, &mockService{})
 
 	router := gin.New()
-	router.POST("/api/shorten", handler.PostURLJSON)
+	router.POST("/api/shorten", handler.URLCreatorJSON)
 
 	w := httptest.NewRecorder()
 	jsonBody := `{"url": "http://example.com"}`
