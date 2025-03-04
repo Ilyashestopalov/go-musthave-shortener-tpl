@@ -30,7 +30,7 @@ func (m *mockService) GetOriginalURL(input string) (string, bool) {
 	return "", false
 }
 
-func TestPostURL(t *testing.T) {
+func TestURLCreator(t *testing.T) {
 	cfg := &config.Config{BaseURL: "http://localhost:8080"}
 	handler := NewHandler(cfg, &mockService{})
 
@@ -70,7 +70,7 @@ func TestRedirectURL(t *testing.T) {
 	assert.Equal(t, "http://example.com", res.Header.Get("Location")) // Проверяем редирект
 }
 
-func TestPostURLJSON(t *testing.T) {
+func TestURLCreatorJSON(t *testing.T) {
 	cfg := &config.Config{BaseURL: "http://localhost:8080"}
 	handler := NewHandler(cfg, &mockService{})
 
