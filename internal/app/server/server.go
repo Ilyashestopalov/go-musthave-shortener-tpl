@@ -25,7 +25,7 @@ func Run(logger *zap.Logger, cfg *config.Config) error {
 	service := services.NewURLService(store)
 	handler := handlers.NewHandler(cfg, service)
 
-	router.GET("/:url", handler.GetURL)
+	router.GET("/:url", handler.RedirectURL)
 	router.POST("/", handler.URLCreator)
 	router.POST("/api/shorten", handler.URLCreatorJSON)
 

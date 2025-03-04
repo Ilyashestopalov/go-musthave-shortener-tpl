@@ -20,7 +20,7 @@ func NewHandler(cfg *config.Config, service services.URLShortener) *Handler {
 	return &Handler{cfg: cfg, Service: service}
 }
 
-func (h *Handler) URLCreator(c *gin.Context) {
+func (h *Handler) PostURL(c *gin.Context) {
 	defer c.Request.Body.Close()
 
 	body, err := io.ReadAll(c.Request.Body)
@@ -45,7 +45,7 @@ func (h *Handler) URLCreator(c *gin.Context) {
 	c.String(http.StatusCreated, h.cfg.BaseURL+"/"+shortURL)
 }
 
-func (h *Handler) URLCreatorJSON(c *gin.Context) {
+func (h *Handler) PostURLJSON(c *gin.Context) {
 	defer c.Request.Body.Close()
 
 	body, err := io.ReadAll(c.Request.Body)
@@ -83,7 +83,7 @@ func (h *Handler) URLCreatorJSON(c *gin.Context) {
 	}
 }
 
-func (h *Handler) GetURL(c *gin.Context) {
+func (h *Handler) RedirectURL(c *gin.Context) {
 	key := c.Param("url")
 	originalURL, exists := h.Service.GetOriginalURL(key)
 	if !exists {

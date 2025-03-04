@@ -30,12 +30,12 @@ func (m *mockService) GetOriginalURL(input string) (string, bool) {
 	return "", false
 }
 
-func TestURLCreator(t *testing.T) {
+func TestPostURL(t *testing.T) {
 	cfg := &config.Config{BaseURL: "http://localhost:8080"}
 	handler := NewHandler(cfg, &mockService{})
 
 	router := gin.New()
-	router.POST("/", handler.URLCreator)
+	router.POST("/", handler.PostURL)
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader("http://example.com"))
@@ -50,12 +50,12 @@ func TestURLCreator(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, res.StatusCode)
 }
 
-func TestGetURL(t *testing.T) {
+func TestRedirectURL(t *testing.T) {
 	cfg := &config.Config{BaseURL: "http://localhost:8080"}
 	handler := NewHandler(cfg, &mockService{})
 
 	router := gin.New()
-	router.GET("/:url", handler.GetURL)
+	router.GET("/:url", handler.RedirectURL)
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/abcdef", nil)
@@ -70,12 +70,12 @@ func TestGetURL(t *testing.T) {
 	assert.Equal(t, "http://example.com", res.Header.Get("Location")) // Проверяем редирект
 }
 
-func TestURLCreatorJSON(t *testing.T) {
+func TestPostURLJSON(t *testing.T) {
 	cfg := &config.Config{BaseURL: "http://localhost:8080"}
 	handler := NewHandler(cfg, &mockService{})
 
 	router := gin.New()
-	router.POST("/api/shorten", handler.URLCreatorJSON)
+	router.POST("/api/shorten", handler.PostURLJSON)
 
 	w := httptest.NewRecorder()
 	jsonBody := `{"url": "http://example.com"}`
