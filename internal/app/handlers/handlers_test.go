@@ -39,7 +39,7 @@ func TestURLCreator(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader("http://example.com"))
-	r.Header.Set("Content-Type", "text/plain") // Добавляем заголовок
+	r.Header.Set("Content-Type", "text/plain")
 
 	router.ServeHTTP(w, r)
 
@@ -58,7 +58,7 @@ func TestRedirectURL(t *testing.T) {
 	router.GET("/:url", handler.RedirectURL)
 
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/abcdef", nil)
+	r := httptest.NewRequest(http.MethodGet, "/azazaz", nil)
 
 	router.ServeHTTP(w, r)
 
@@ -90,7 +90,7 @@ func TestURLCreatorJSON(t *testing.T) {
 	require.NotNil(t, res)
 	assert.Equal(t, http.StatusCreated, res.StatusCode)
 
-	expectedResponse := `{"result":"http://localhost:8080/abcdef"}`
+	expectedResponse := `{"result":"http://localhost:8080/azazaz"}`
 	bodyBytes, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	assert.JSONEq(t, expectedResponse, string(bodyBytes))

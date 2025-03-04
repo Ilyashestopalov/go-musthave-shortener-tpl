@@ -27,15 +27,29 @@ func LoadConfig() (*Config, error) {
 	flag.Parse()
 
 	// Overwrite with environment variables if set
-	if baseURL == "" {
-		baseURL = os.Getenv("BASE_URL")
+	if v := os.Getenv("BASE_URL"); v != "" {
+		baseURL = v
 	}
-	if serverName == "" {
-		serverName = os.Getenv("SERVER_NAME")
+	if v := os.Getenv("SERVER_NAME"); v != "" {
+		serverName = v
 	}
-	if fileStoragePath == "" {
-		fileStoragePath = os.Getenv("FILE_STORAGE_PATH")
+	if v := os.Getenv("FILE_STORAGE_PATH"); v != "" {
+		fileStoragePath = v
 	}
+
+	/*
+		if os.Getenv("BASE_URL") != "" {
+			baseURL = os.Getenv("BASE_URL")
+		}
+
+		if os.Getenv("SERVER_NAME") != "" {
+			serverName = os.Getenv("SERVER_NAME")
+		}
+
+		if os.Getenv("FILE_STORAGE_PATH") != "" {
+			fileStoragePath = os.Getenv("FILE_STORAGE_PATH")
+		}
+	*/
 
 	return &Config{
 		BaseURL:         baseURL,

@@ -1,6 +1,8 @@
 package server
 
 import (
+	"fmt"
+
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/handlers"
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/middlewares"
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/services"
@@ -28,6 +30,6 @@ func Run(logger *zap.Logger, cfg *config.Config) error {
 	router.GET("/:url", handler.RedirectURL)
 	router.POST("/", handler.URLCreator)
 	router.POST("/api/shorten", handler.URLCreatorJSON)
-	// fmt.Printf("%+v\n", cfg)
+	fmt.Printf("%+v\n", cfg)
 	return router.Run(cfg.ServerName)
 }
