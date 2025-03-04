@@ -33,7 +33,7 @@ func (fs *FileStore) loadFromFile() {
 	file, err := os.Open(fs.filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return // Если файла нет, продолжаем
+			return
 		}
 		log.Panic(err)
 	}
