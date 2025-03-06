@@ -35,7 +35,8 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 			return
 		}
 		c.JSON(http.StatusCreated, gin.H{"result": fmt.Sprintf("%s/%s", h.baseURL, shortURL)})
-	} else {
+	}
+	if c.ContentType() == "text/html; charset=utf-8" {
 		// For plain text requests, read the body directly
 		var request string
 		raw, _ := io.ReadAll(c.Request.Body)
@@ -56,7 +57,7 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save data"})
 			return
 		}
-		fmt.Printf("ebolaaaaaaaa!!!!!!")
+
 		c.String(http.StatusCreated, fmt.Sprintf("%s/%s", h.baseURL, shortURL))
 		return
 	}
