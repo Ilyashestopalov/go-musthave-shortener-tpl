@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/generators"
@@ -11,12 +12,13 @@ import (
 
 // CreateURL creates a new shortened URL
 func (h *URLHandler) CreateURL(c *gin.Context) {
-	var request struct {
-		URL string `json:"url" binding:"required"`
-	}
 
 	// Handle, TODO move it to sub function
 	if c.ContentType() == "application/json" {
+		var request struct {
+			URL string `json:"url" binding:"required"`
+		}
+
 		if err := c.ShouldBindJSON(&request); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -35,8 +37,10 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 		c.JSON(http.StatusCreated, gin.H{"result": fmt.Sprintf("%s/%s", h.baseURL, shortURL)})
 	} else {
 		// For plain text requests, read the body directly
-		r, err := c.GetRawData()
-		if err != nil {
+		var request string
+		raw, _ := io.ReadAll(c.Request.Body)
+		request = string(raw)
+		if request == "" {
 			c.String(http.StatusBadRequest, "Invalid URL")
 			return
 		}
@@ -45,7 +49,7 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 		urlData := storages.URLData{
 			UUID:        fmt.Sprintf("%d", len(h.store.GetAllURLs())+1), // Simple UUID generation based on count
 			ShortURL:    shortURL,
-			OriginalURL: fmt.Sprintf("%s", r),
+			OriginalURL: request,
 		}
 
 		if err := h.store.AddURL(urlData); err != nil {
