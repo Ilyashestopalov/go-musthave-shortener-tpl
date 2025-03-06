@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/generators"
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/storages"
 	"github.com/gin-gonic/gin"
 )
@@ -20,6 +21,18 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+		shortUrl := generators.SecureRandomString(8)
+		urlData := storages.URLData{
+			UUID:        fmt.Sprintf("%d", len(h.store.GetAllURLs())+1), // Simple UUID generation based on count
+			ShortURL:    shortUrl,
+			OriginalURL: request.URL,
+		}
+
+		if err := h.store.AddURL(urlData); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save data"})
+			return
+		}
+		c.JSON(http.StatusCreated, gin.H{"result": fmt.Sprintf("%s/%s", h.baseURL, shortUrl)})
 	}
 
 	// Handle
@@ -30,19 +43,17 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "URL is required"})
 			return
 		}
-	}
+		shortUrl := generators.SecureRandomString(8)
+		urlData := storages.URLData{
+			UUID:        fmt.Sprintf("%d", len(h.store.GetAllURLs())+1), // Simple UUID generation based on count
+			ShortURL:    shortUrl,
+			OriginalURL: request.URL,
+		}
 
-	shortened := GenerateShortURL()
-	urlData := storages.URLData{
-		UUID:        fmt.Sprintf("%d", len(h.store.GetAllURLs())+1), // Simple UUID generation based on count
-		ShortURL:    shortened,
-		OriginalURL: request.URL,
+		if err := h.store.AddURL(urlData); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save data"})
+			return
+		}
+		c.String(http.StatusCreated, fmt.Sprintf("%s/%s", h.baseURL, shortUrl))
 	}
-
-	if err := h.store.AddURL(urlData); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save data"})
-		return
-	}
-
-	c.JSON(http.StatusCreated, gin.H{"result": fmt.Sprintf("%s/%s", h.baseURL, shortened)})
 }
