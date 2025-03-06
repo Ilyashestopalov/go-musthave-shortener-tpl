@@ -11,7 +11,7 @@ func (h *URLHandler) GetURL(c *gin.Context) {
 	shortURL := c.Param("short_url")
 	urlData, exists := h.store.GetURL(shortURL)
 	if !exists {
-		c.JSON(http.StatusNotFound, gin.H{"error": "URL not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "URL not found Bleat"})
 		return
 	}
 	c.Redirect(http.StatusTemporaryRedirect, urlData.OriginalURL)
