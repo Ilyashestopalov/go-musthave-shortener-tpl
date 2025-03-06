@@ -15,7 +15,7 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 		URL string `json:"url" binding:"required"`
 	}
 
-	// Handle
+	// Handle, TODO move it to sub function
 	if c.ContentType() == "application/json" {
 		if err := c.ShouldBindJSON(&request); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -35,7 +35,7 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 		c.JSON(http.StatusCreated, gin.H{"result": fmt.Sprintf("%s/%s", h.baseURL, shortUrl)})
 	}
 
-	// Handle
+	// Handle, TODO move it to sub function
 	if c.ContentType() == "text/plain" {
 		// For plain text requests, read the body directly
 		request.URL = c.PostForm("url")
@@ -43,10 +43,10 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "URL is required"})
 			return
 		}
-		shortUrl := generators.SecureRandomString(8)
+		shortURL := generators.SecureRandomString(8)
 		urlData := storages.URLData{
 			UUID:        fmt.Sprintf("%d", len(h.store.GetAllURLs())+1), // Simple UUID generation based on count
-			ShortURL:    shortUrl,
+			ShortURL:    shortURL,
 			OriginalURL: request.URL,
 		}
 
@@ -54,6 +54,6 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save data"})
 			return
 		}
-		c.String(http.StatusCreated, fmt.Sprintf("%s/%s", h.baseURL, shortUrl))
+		c.String(http.StatusCreated, fmt.Sprintf("%s/%s", h.baseURL, shortURL))
 	}
 }
