@@ -21,10 +21,10 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		shortUrl := generators.SecureRandomString(8)
+		shortURL := generators.SecureRandomString(8)
 		urlData := storages.URLData{
 			UUID:        fmt.Sprintf("%d", len(h.store.GetAllURLs())+1), // Simple UUID generation based on count
-			ShortURL:    shortUrl,
+			ShortURL:    shortURL,
 			OriginalURL: request.URL,
 		}
 
