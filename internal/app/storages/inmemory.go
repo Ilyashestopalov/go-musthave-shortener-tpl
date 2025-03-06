@@ -4,26 +4,48 @@ import (
 	"sync"
 )
 
+// InMemoryStore implements DataStore and holds URLs in memory
 type InMemoryStore struct {
-	data map[string]string
-	mu   sync.RWMutex
+	sync.RWMutex
+	URLs map[string]URLData
 }
 
-func NewStore() *InMemoryStore {
-	return &InMemoryStore{
-		data: make(map[string]string),
+// NewInMemoryStore creates a new InMemoryStore
+func NewInMemoryStore() *InMemoryStore {
+	return &InMemoryStore{URLs: make(map[string]URLData)}
+}
+
+// AddURL adds a URL to the store
+func (ims *InMemoryStore) AddURL(urlData URLData) error {
+	ims.Lock()
+	defer ims.Unlock()
+	ims.URLs[urlData.ShortURL] = urlData
+	return nil
+}
+
+// GetURL retrieves a URL by short URL
+func (ims *InMemoryStore) GetURL(shortURL string) (URLData, bool) {
+	ims.RLock()
+	defer ims.RUnlock()
+	urlData, exists := ims.URLs[shortURL]
+	return urlData, exists
+}
+
+// DeleteURL deletes a URL from the store
+func (ims *InMemoryStore) DeleteURL(shortURL string) error {
+	ims.Lock()
+	defer ims.Unlock()
+	delete(ims.URLs, shortURL)
+	return nil
+}
+
+// GetAllURLs returns all URLs
+func (ims *InMemoryStore) GetAllURLs() []URLData {
+	ims.RLock()
+	defer ims.RUnlock()
+	var urls []URLData
+	for _, urlData := range ims.URLs {
+		urls = append(urls, urlData)
 	}
-}
-
-func (m *InMemoryStore) Get(shortURL string) (string, bool) {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-	value, exists := m.data[shortURL]
-	return value, exists
-}
-
-func (m *InMemoryStore) Set(shortURL, originalURL string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.data[shortURL] = originalURL
+	return urls
 }

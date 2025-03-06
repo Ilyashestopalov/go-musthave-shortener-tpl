@@ -1,35 +1,30 @@
 package server
 
 import (
-	"fmt"
-
+	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/configs"
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/handlers"
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/middlewares"
-	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/services"
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/storages"
-	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/config"
-	"github.com/gin-gonic/gin"
+
 	"go.uber.org/zap"
+
+	"github.com/gin-gonic/gin"
 )
 
-func Run(logger *zap.Logger, cfg *config.Config) error {
-	gin.SetMode(gin.ReleaseMode)
-
-	defer logger.Sync()
-
-	router := gin.New()
-
-	sugar := logger.Sugar()
-	router.Use(middlewares.LoggerMiddleware(sugar))
+// StartServer initializes the server and routes
+func StartServer(store storages.DataStore, logger *zap.Logger, cfg *configs.Config) {
+	router := gin.Default()
+	router.Use(middlewares.LoggingMiddleware(logger))
 	router.Use(middlewares.GzipMiddleware())
 
-	store := storages.NewFileStore(cfg.FileStoragePath)
-	service := services.NewURLService(store)
-	handler := handlers.NewHandler(cfg, service)
+	urlHandler := handlers.NewURLHandler(store, cfg.BaseURL)
 
-	router.GET("/:url", handler.RedirectURL)
-	router.POST("/", handler.URLCreator)
-	router.POST("/api/shorten", handler.URLCreatorJSON)
-	fmt.Printf("%+v\n", cfg)
-	return router.Run(cfg.ServerName)
+	router.POST("/", urlHandler.CreateURL)
+	router.GET("/:short_url", urlHandler.GetURL)
+	router.DELETE("/:short_url", urlHandler.DeleteURL)
+
+	// Start the server
+	if err := router.Run(cfg.ServerName); err != nil {
+		logger.Fatal("Failed to start server", zap.Error(err))
+	}
 }

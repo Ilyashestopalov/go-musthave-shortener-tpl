@@ -1,32 +1,38 @@
 package main
 
 import (
-	"log"
-
+	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/configs"
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/server"
-	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/config"
+	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/storages"
+
 	"go.uber.org/zap"
 )
 
-// Main function to set up the Gin server
 func main() {
+	// Load configuration
+	cfg := configs.LoadConfig()
 
 	// Initialize the logger
 	logger, err := zap.NewProduction()
 	if err != nil {
 		panic("Failed to initialize logger")
 	}
-	defer logger.Sync() // Flush any buffered log entries
+	defer logger.Sync()
 
-	// Load configuration
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		log.Fatal("Error loading configuration:", err)
+	if cfg.PostgresURL != "" {
+		store, err := storages.NewPostgreSQLStore(cfg.PostgresURL)
+		if err != nil {
+			logger.Fatal("Failed to connect to PostgreSQL", zap.Error(err))
+		}
+		server.StartServer(store, logger, cfg)
+	} else if cfg.FileStoragePath != "" {
+		store := storages.NewFileStore(cfg.FileStoragePath)
+		if err := store.LoadData(); err != nil {
+			logger.Fatal("Failed to load data", zap.Error(err))
+		}
+		server.StartServer(store, logger, cfg)
+	} else {
+		store := storages.NewInMemoryStore()
+		server.StartServer(store, logger, cfg)
 	}
-
-	err = server.Run(logger, cfg)
-	if err != nil {
-		log.Fatal("Server failed to start", err)
-	}
-
 }
