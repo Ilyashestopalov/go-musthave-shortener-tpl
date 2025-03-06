@@ -1,18 +1,26 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"time"
 
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/interfaces"
+	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/middlewares"
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/app/shortner"
 	"github.com/Ilyashestopalov/go-musthave-shortener-tpl/internal/config"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 // Main function to set up the Gin server
 func main() {
+
+	// Initialize the logger
+	logger, err := zap.NewProduction()
+	if err != nil {
+		panic("Failed to initialize logger")
+	}
+	defer logger.Sync() // Flush any buffered log entries
+
 	shortener := interfaces.NewMapURLShortener()
 
 	// Load configuration
@@ -23,21 +31,8 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
-	// LoggerWithFormatter middleware will write the logs to gin.DefaultWriter
-	// By default gin.DefaultWriter = os.Stdout
-	router.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-		return fmt.Sprintf("%s ;; %s ;; %s %s ;; %s ;; %d ;; %s ;; %s ;; %s\n",
-			param.TimeStamp.Format(time.RFC3339),
-			param.ClientIP,
-			param.Method,
-			param.Path,
-			param.Request.Proto,
-			param.StatusCode,
-			param.Latency,
-			param.Request.UserAgent(),
-			param.ErrorMessage,
-		)
-	}))
+
+	router.Use(middlewares.Logger(logger))
 
 	router.POST("/", shortner.ShortenURLHandler(shortener, cfg.BaseURL))
 	router.GET("/:shortened", shortner.RedirectURLHandler(shortener))
