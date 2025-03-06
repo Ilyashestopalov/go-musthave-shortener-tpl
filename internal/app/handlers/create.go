@@ -33,27 +33,27 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 			return
 		}
 		c.JSON(http.StatusCreated, gin.H{"result": fmt.Sprintf("%s/%s", h.baseURL, shortURL)})
-	}
-
-	// Handle, TODO move it to sub function
-	if c.ContentType() == "text/plain" {
+	} else {
 		// For plain text requests, read the body directly
-		request.URL = c.PostForm("url")
-		if request.URL == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "URL is required"})
+		r, err := c.GetRawData()
+		if err != nil {
+			c.String(http.StatusBadRequest, "Invalid URL")
 			return
 		}
+
 		shortURL := generators.SecureRandomString(8)
 		urlData := storages.URLData{
 			UUID:        fmt.Sprintf("%d", len(h.store.GetAllURLs())+1), // Simple UUID generation based on count
 			ShortURL:    shortURL,
-			OriginalURL: request.URL,
+			OriginalURL: fmt.Sprintf("%s", r),
 		}
 
 		if err := h.store.AddURL(urlData); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save data"})
 			return
 		}
+		fmt.Printf("ebolaaaaaaaa!!!!!!")
 		c.String(http.StatusCreated, fmt.Sprintf("%s/%s", h.baseURL, shortURL))
+		return
 	}
 }
