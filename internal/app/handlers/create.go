@@ -35,10 +35,7 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 			return
 		}
 		c.JSON(http.StatusCreated, gin.H{"result": fmt.Sprintf("%s/%s", h.baseURL, shortURL)})
-	}
-
-	// Handle, TODO move it to sub function
-	if c.ContentType() != "application/json" {
+	} else {
 		// For plain text requests, read the body directly
 		var request string
 		raw, _ := io.ReadAll(c.Request.Body)

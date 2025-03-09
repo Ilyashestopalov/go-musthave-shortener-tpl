@@ -8,7 +8,7 @@ import (
 
 // GetURL retrieves the original URL based on the short URL
 func (h *URLHandler) GetURL(c *gin.Context) {
-	if c.ContentType() == "text/html; charset=utf-8" {
+	if c.ContentType() != "application/json" {
 		shortURL := c.Param("short_url")
 		urlData, exists := h.store.GetURL(shortURL)
 		if !exists {
