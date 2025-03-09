@@ -18,6 +18,7 @@ func setupRouter(store storages.DataStore) *gin.Engine {
 
 	r.POST("/", urlHandler.CreateURL)
 	r.GET("/:short_url", urlHandler.GetURL)
+	r.DELETE("/:short_url", urlHandler.DeleteURL)
 
 	return r
 }
@@ -74,7 +75,7 @@ func TestURLShortener(t *testing.T) {
 	t.Run("Create URL with plain text", func(t *testing.T) {
 		urlToShorten := "http://example2.com"
 		formValue := "url=" + urlToShorten
-		req, _ := http.NewRequest("POST", "/urls", bytes.NewBufferString(formValue))
+		req, _ := http.NewRequest("POST", "/", bytes.NewBufferString(formValue))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		resp := httptest.NewRecorder()
 		router.ServeHTTP(resp, req)
@@ -88,7 +89,7 @@ func TestURLShortener(t *testing.T) {
 		assert.NotEmpty(t, shortURL)
 
 		// Test GET
-		req, _ = http.NewRequest("GET", "/urls/"+shortURL, nil)
+		req, _ = http.NewRequest("GET", "/"+shortURL, nil)
 		resp = httptest.NewRecorder()
 		router.ServeHTTP(resp, req)
 
@@ -101,14 +102,14 @@ func TestURLShortener(t *testing.T) {
 		assert.Equal(t, urlToShorten, retrievedResponse.OriginalURL)
 
 		// Test DELETE
-		req, _ = http.NewRequest("DELETE", "/urls/"+shortURL, nil)
+		req, _ = http.NewRequest("DELETE", "/"+shortURL, nil)
 		resp = httptest.NewRecorder()
 		router.ServeHTTP(resp, req)
 
 		assert.Equal(t, http.StatusNoContent, resp.Code)
 
 		// Test GET after delete
-		req, _ = http.NewRequest("GET", "/urls/"+shortURL, nil)
+		req, _ = http.NewRequest("GET", "/"+shortURL, nil)
 		resp = httptest.NewRecorder()
 		router.ServeHTTP(resp, req)
 
