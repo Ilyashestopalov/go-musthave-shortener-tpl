@@ -22,7 +22,7 @@ func getEnv(key, fallback string) string {
 	return value
 }
 
-// LoadConfig loads configuration from environment variables or command-line arguments
+// LoadConfig loads configuration from environment variables or command-line arguments!
 func LoadConfig() *Config {
 	filePath := flag.String("f", getEnv("FILE_STORAGE_PATH", "/tmp/storage.data"), "File storage path")
 	postgresURL := flag.String("d", getEnv("POSTGRES_STORAGE_URL", ""), "PostgreSQL connection URL")
