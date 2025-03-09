@@ -10,11 +10,16 @@ import (
 func (h *URLHandler) GetURL(c *gin.Context) {
 	if c.ContentType() != "application/json" {
 		shortURL := c.Param("short_url")
-		urlData, exists := h.store.GetURL(shortURL)
-		if !exists {
-			c.String(http.StatusNotFound, "URL Not Found")
+		if shortURL == "" {
+			c.String(http.StatusOK, "")
 			return
+		} else {
+			urlData, exists := h.store.GetURL(shortURL)
+			if !exists {
+				c.String(http.StatusNotFound, "URL Not Found")
+				return
+			}
+			c.Redirect(http.StatusTemporaryRedirect, urlData.OriginalURL)
 		}
-		c.Redirect(http.StatusTemporaryRedirect, urlData.OriginalURL)
 	}
 }
