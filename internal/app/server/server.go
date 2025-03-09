@@ -20,6 +20,7 @@ func StartServer(store storages.DataStore, logger *zap.Logger, cfg *configs.Conf
 	urlHandler := handlers.NewURLHandler(store, cfg.BaseURL)
 
 	router.POST("/", urlHandler.CreateURL)
+	router.POST("/api/shorten", urlHandler.CreateURL)
 	router.GET("/:short_url", urlHandler.GetURL)
 	router.DELETE("/:short_url", urlHandler.DeleteURL)
 
