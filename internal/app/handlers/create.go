@@ -36,6 +36,8 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 		}
 		c.JSON(http.StatusOK, gin.H{"result": fmt.Sprintf("%s/%s", h.baseURL, shortURL)})
 	}
+
+	// Handle, TODO move it to sub function
 	if c.ContentType() == "text/html; charset=utf-8" {
 		// For plain text requests, read the body directly
 		var request string
