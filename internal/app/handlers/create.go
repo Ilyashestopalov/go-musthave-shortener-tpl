@@ -34,7 +34,7 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save data"})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"result": fmt.Sprintf("%s/%s", h.baseURL, shortURL)})
+		c.JSON(http.StatusCreated, gin.H{"result": fmt.Sprintf("%s/%s", h.baseURL, shortURL)})
 	}
 
 	// Handle, TODO move it to sub function
@@ -60,7 +60,7 @@ func (h *URLHandler) CreateURL(c *gin.Context) {
 			return
 		}
 
-		c.String(http.StatusOK, fmt.Sprintf("%s/%s", h.baseURL, shortURL))
+		c.String(http.StatusCreated, fmt.Sprintf("%s/%s", h.baseURL, shortURL))
 		return
 	}
 }
