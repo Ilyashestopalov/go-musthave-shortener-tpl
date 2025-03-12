@@ -27,10 +27,10 @@ func GzipMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		gzWriter := gzip.NewWriter(c.Writer)
-		defer gzWriter.Close()
+		gzipWriter := gzip.NewWriter(c.Writer)
+		defer gzipWriter.Close()
 
-		c.Writer = &gzipResponseWriter{ResponseWriter: c.Writer, Writer: gzWriter}
+		c.Writer = &gzipResponseWriter{ResponseWriter: c.Writer, Writer: gzipWriter}
 		c.Header("Content-Encoding", "gzip")
 
 		c.Next()
@@ -39,7 +39,7 @@ func GzipMiddleware() gin.HandlerFunc {
 
 type gzipResponseWriter struct {
 	gin.ResponseWriter
-	Writer gzip.Writer
+	Writer *gzip.Writer
 }
 
 func (g *gzipResponseWriter) Write(b []byte) (int, error) {
