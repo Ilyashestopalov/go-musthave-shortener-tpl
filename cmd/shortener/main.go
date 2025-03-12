@@ -25,7 +25,7 @@ func main() {
 				logger.Fatal("Failed to connect to PostgreSQL", zap.Error(err))
 			}
 			server.StartServer(store, logger, cfg)
-	*/
+	/*/
 	if cfg.FileStoragePath != "" {
 		store := storages.NewFileStore(cfg.FileStoragePath)
 		if err := store.LoadData(); err != nil {
