@@ -18,21 +18,24 @@ func main() {
 		panic("Failed to initialize logger")
 	}
 	defer logger.Sync()
-
-	if cfg.PostgresURL != "" {
-		store, err := storages.NewPostgreSQLStore(cfg.PostgresURL)
-		if err != nil {
-			logger.Fatal("Failed to connect to PostgreSQL", zap.Error(err))
+	/*
+		if cfg.PostgresURL != "" {
+			store, err := storages.NewPostgreSQLStore(cfg.PostgresURL)
+			if err != nil {
+				logger.Fatal("Failed to connect to PostgreSQL", zap.Error(err))
+			}
+			server.StartServer(store, logger, cfg)
+		} else if cfg.FileStoragePath != "" {
+			store := storages.NewFileStore(cfg.FileStoragePath)
+			if err := store.LoadData(); err != nil {
+				logger.Fatal("Failed to load data", zap.Error(err))
+			}
+			server.StartServer(store, logger, cfg)
+		} else {
+			store := storages.NewInMemoryStore()
+			server.StartServer(store, logger, cfg)
 		}
-		server.StartServer(store, logger, cfg)
-	} else if cfg.FileStoragePath != "" {
-		store := storages.NewFileStore(cfg.FileStoragePath)
-		if err := store.LoadData(); err != nil {
-			logger.Fatal("Failed to load data", zap.Error(err))
-		}
-		server.StartServer(store, logger, cfg)
-	} else {
-		store := storages.NewInMemoryStore()
-		server.StartServer(store, logger, cfg)
-	}
+	*/
+	store := storages.NewInMemoryStore()
+	server.StartServer(store, logger, cfg)
 }
