@@ -39,7 +39,7 @@ func GzipMiddleware() gin.HandlerFunc {
 
 type gzipResponseWriter struct {
 	gin.ResponseWriter
-	Writer io.Writer
+	Writer gzip.Writer
 }
 
 func (g *gzipResponseWriter) Write(b []byte) (int, error) {
