@@ -55,7 +55,7 @@ func GzipMiddleware() gin.HandlerFunc {
 		c.Next()
 
 		// Check if the response status is OK and if the request accepts gzip encoding
-		if c.Writer.Status() == http.StatusOK && c.Request.Header.Get("Accept-Encoding") == "gzip" {
+		if c.Writer.Status() == http.StatusOK {
 			// Check if the Content-Type is application/json or text/html
 			contentType := c.Writer.Header().Get("Content-Type")
 			if contentType == "application/json" || contentType == "text/html" {
@@ -66,7 +66,7 @@ func GzipMiddleware() gin.HandlerFunc {
 				}
 
 				// Set the Content-Encoding header to gzip
-				c.Writer.Header().Set("Accept-Encoding", "gzip")
+				c.Writer.Header().Set("Content-Encoding", "gzip")
 				c.Writer.Header().Set("Content-Type", contentType) // Maintain original Content-Type
 				c.Writer.WriteHeader(c.Writer.Status())
 				io.Copy(c.Writer, &buf)
