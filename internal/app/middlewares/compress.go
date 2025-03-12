@@ -1,45 +1,73 @@
 package middlewares
 
 import (
+	"bytes"
 	"compress/gzip"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-// .GzipMiddleware compresses the response using gzip for specific content types
+// GzipMiddleware checks for Content-Encoding and compresses responses
 func GzipMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.GetHeader("Content-Encoding") == "gzip" {
+		// Check if the Content-Encoding header is set to gzip
+		if c.Request.Header.Get("Content-Encoding") == "gzip" {
+			// Create a new gzip reader to decompress the request body
 			reader, err := gzip.NewReader(c.Request.Body)
 			if err != nil {
-				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid Gzip content"})
+				c.String(http.StatusBadRequest, "Invalid gzip encoding")
+				c.Abort()
 				return
 			}
 			defer reader.Close()
-			c.Request.Body = io.NopCloser(reader)
+
+			// Read the decompressed body
+			decompressedBody, err := io.ReadAll(reader)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Error reading decompressed body")
+				c.Abort()
+				return
+			}
+
+			// Replace the original request body with the decompressed data
+			c.Request.Body = io.NopCloser(bytes.NewBuffer(decompressedBody))
+			c.Request.ContentLength = int64(len(decompressedBody))
 		}
 
-		if !strings.Contains(c.GetHeader("Accept-Encoding"), "gzip") {
-			c.Next()
-			return
-		}
+		// Create a buffer to hold the compressed response
+		var buf bytes.Buffer
+		gz := gzip.NewWriter(&buf)
+		defer gz.Close()
 
-		gzipWriter := gzip.NewWriter(c.Writer)
-		defer gzipWriter.Close()
+		// Wrap the ResponseWriter to capture the response
+		w := &gzipResponseWriter{ResponseWriter: c.Writer, Writer: gz}
+		c.Writer = w
 
-		c.Writer = &gzipResponseWriter{ResponseWriter: c.Writer, Writer: gzipWriter}
-		c.Header("Accept-Encoding", "gzip")
-
+		// Process the request
 		c.Next()
+
+		// Check if the response status is OK and if the request accepts gzip encoding
+		if c.Writer.Status() == http.StatusOK && c.Request.Header.Get("Accept-Encoding") == "gzip" {
+			// Close the gzip writer to flush the data
+			if err := gz.Close(); err != nil {
+				c.Error(err)
+				return
+			}
+
+			// Set the Content-Encoding header to gzip
+			c.Writer.Header().Set("Content-Encoding", "gzip")
+			c.Writer.Header().Set("Content-Type", c.Writer.Header().Get("Content-Type"))
+			c.Writer.WriteHeader(c.Writer.Status())
+			io.Copy(c.Writer, &buf)
+		}
 	}
 }
 
 type gzipResponseWriter struct {
 	gin.ResponseWriter
-	Writer *gzip.Writer
+	Writer io.Writer
 }
 
 func (g *gzipResponseWriter) Write(b []byte) (int, error) {
