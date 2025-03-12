@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GzipMiddleware compresses the response using gzip for specific content types
+// .GzipMiddleware compresses the response using gzip for specific content types
 func GzipMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.GetHeader("Content-Encoding") == "gzip" {
