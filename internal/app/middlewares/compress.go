@@ -47,20 +47,20 @@ func GzipMiddleware() gin.HandlerFunc {
 		c.Next()
 
 		// Check if we need to compress the response
-		if c.Writer.Status() == http.StatusOK && (c.Writer.Header().Get("Accept-Encoding") == "gzip" || c.Writer.Header().Get("Content-Encoding") == "gzip") {
-			// Close the gzip writer to flush the data
-			if err := gz.Close(); err != nil {
-				c.Error(err)
-				return
-			}
-
-			// Set the Content-Encoding header
-			c.Writer.Header().Set("Content-Encoding", "gzip")
-			c.Writer.Header().Set("Accept-Encoding", "gzip")
-			c.Writer.Header().Set("Content-Type", c.Writer.Header().Get("Content-Type"))
-			c.Writer.WriteHeader(c.Writer.Status())
-			io.Copy(c.Writer, &buf)
+		// if c.Writer.Status() == http.StatusOK && (c.Writer.Header().Get("Accept-Encoding") == "gzip" || c.Writer.Header().Get("Content-Encoding") == "gzip") {
+		// Close the gzip writer to flush the data
+		if err := gz.Close(); err != nil {
+			c.Error(err)
+			return
 		}
+
+		// Set the Content-Encoding header
+		c.Writer.Header().Set("Content-Encoding", "gzip")
+		c.Writer.Header().Set("Accept-Encoding", "gzip")
+		c.Writer.Header().Set("Content-Type", c.Writer.Header().Get("Content-Type"))
+		c.Writer.WriteHeader(c.Writer.Status())
+		io.Copy(c.Writer, &buf)
+		// }
 	}
 }
 
