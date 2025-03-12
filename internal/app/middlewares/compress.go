@@ -55,7 +55,8 @@ func GzipMiddleware() gin.HandlerFunc {
 			}
 
 			// Set the Content-Encoding header
-			c.Writer.Header().Set("Content-Encoding", "gzip")
+			// c.Writer.Header().Set("Content-Encoding", "gzip")
+			c.Writer.Header().Set("Accept-Encoding", "gzip")
 			c.Writer.Header().Set("Content-Type", c.Writer.Header().Get("Content-Type"))
 			c.Writer.WriteHeader(c.Writer.Status())
 			io.Copy(c.Writer, &buf)
