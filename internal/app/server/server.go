@@ -15,7 +15,7 @@ import (
 func StartServer(store storages.DataStore, logger *zap.Logger, cfg *configs.Config) {
 	router := gin.Default()
 	router.Use(middlewares.LoggingMiddleware(logger))
-	//router.Use(middlewares.GzipMiddleware())
+	router.Use(middlewares.GzipMiddleware())
 
 	urlHandler := handlers.NewURLHandler(store, cfg.BaseURL)
 
