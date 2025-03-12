@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,6 +37,11 @@ func GzipMiddleware() gin.HandlerFunc {
 			c.Request.ContentLength = int64(len(decompressedBody))
 		}
 
+		if !strings.Contains(c.GetHeader("Accept-Encoding"), "gzip") {
+			c.Next()
+			return
+		}
+
 		// Create a buffer to hold the compressed response
 		var buf bytes.Buffer
 		gz := gzip.NewWriter(&buf)
@@ -60,7 +66,7 @@ func GzipMiddleware() gin.HandlerFunc {
 				}
 
 				// Set the Content-Encoding header to gzip
-				c.Writer.Header().Set("Content-Encoding", "gzip")
+				c.Writer.Header().Set("Accept-Encoding", "gzip")
 				c.Writer.Header().Set("Content-Type", contentType) // Maintain original Content-Type
 				c.Writer.WriteHeader(c.Writer.Status())
 				io.Copy(c.Writer, &buf)
