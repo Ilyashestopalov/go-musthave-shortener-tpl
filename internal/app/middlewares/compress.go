@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"bytes"
 	"compress/gzip"
 	"io"
 	"net/http"
@@ -68,34 +67,13 @@ func GzipMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		var buf bytes.Buffer
-		gz := gzip.NewWriter(&buf)
-		defer gz.Close()
+		gzWriter := gzip.NewWriter(c.Writer)
+		defer gzWriter.Close()
 
-		// Wrap the ResponseWriter
-		w := &gzipResponseWriter{ResponseWriter: c.Writer, Writer: gz}
-		c.Writer = w
+		c.Writer = &gzipResponseWriter{ResponseWriter: c.Writer, Writer: gzWriter}
+		c.Header("Content-Encoding", "gzip")
 
-		// Process the request
 		c.Next()
-
-		// Check if we need to compress the response
-		if c.Writer.Status() == http.StatusOK &&
-			(c.Writer.Header().Get("Content-Type") == "application/json" ||
-				c.Writer.Header().Get("Content-Type") == "text/html") {
-
-			// Close the gzip writer to flush the data
-			if err := gz.Close(); err != nil {
-				c.Error(err)
-				return
-			}
-
-			// Set the Content-Encoding header
-			c.Writer.Header().Set("Content-Encoding", "gzip")
-			c.Writer.Header().Set("Content-Type", c.Writer.Header().Get("Content-Type"))
-			c.Writer.WriteHeader(c.Writer.Status())
-			io.Copy(c.Writer, &buf)
-		}
 	}
 }
 
