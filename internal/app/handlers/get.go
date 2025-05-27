@@ -19,6 +19,7 @@ func (h *URLHandler) GetURL(c *gin.Context) {
 				c.String(http.StatusNotFound, "URL Not Found")
 				return
 			}
+			c.Header("Content-Type", "text/plain")
 			c.Redirect(http.StatusTemporaryRedirect, urlData.OriginalURL)
 		}
 	}
